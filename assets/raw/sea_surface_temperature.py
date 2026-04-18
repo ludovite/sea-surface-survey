@@ -1,7 +1,6 @@
 """@bruin
 name: raw.sea_surface_temperature
-image: python:3.12
-connection: gcp-prod
+connection: duckdb-dev
 
 materialization:
   type: table
@@ -39,7 +38,7 @@ from pathlib import Path
 
 import cdsapi
 import numpy as np
-import pandas as pd
+# import pandas as pd
 import xarray as xr
 
 warnings.filterwarnings("ignore")
@@ -80,11 +79,8 @@ def materialize():
         with zipfile.ZipFile(zip_path) as zf:
             zf.extractall(nc_dir)
 
-        ds = xr.open_mfdataset(
-            sorted(nc_dir.glob("*.nc")),
-            combine="by_coords",
-            chunks={"time": 1},
-        )
+        nc_files = sorted(nc_dir.glob("*.nc"))
+        ds = xr.open_dataset(nc_files[0], engine="netcdf4")
         ds = ds[["analysed_sst", "sea_ice_fraction"]]
 
         # Align SST 0.05° grid onto SLA 0.25° grid via bilinear interpolation

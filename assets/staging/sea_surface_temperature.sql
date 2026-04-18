@@ -1,20 +1,15 @@
 /* @bruin
 name: staging.sea_surface_temperature
-type: bq.sql
+type: duckdb.sql
 
 materialization:
   type: table
-  strategy: delete+insert
-  incremental_key: year_month
-  partition_by: year_month
-  cluster_by:
-    - latitude
-    - longitude
+  strategy: create+replace
 
 columns:
   - name: year_month
     type: DATE
-    description: First day of the observation month (partition key)
+    description: First day of the observation month
   - name: year
     type: INTEGER
   - name: month
@@ -37,7 +32,7 @@ depends:
 @bruin */
 
 SELECT
-    DATE(year, month, 1)    AS year_month,
+    MAKE_DATE(year, month, 1)                           AS year_month,
     year,
     month,
     latitude,
@@ -46,5 +41,5 @@ SELECT
     sea_ice_fraction
 FROM raw.sea_surface_temperature
 WHERE
-    year  = EXTRACT(year  FROM DATE('{{ start_date }}'))
-    AND month = EXTRACT(month FROM DATE('{{ start_date }}'))
+    year  = EXTRACT(year  FROM CAST('{{ start_date }}' AS DATE))
+    AND month = EXTRACT(month FROM CAST('{{ start_date }}' AS DATE))

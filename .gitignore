@@ -17,3 +17,8 @@ data/
 
 # Bruin (contains credentials)
 .bruin.yml
+.gcp-credentials.json
+
+logs/runs
+logs/*.log
+*.py[cod]bruin_history.db

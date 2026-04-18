@@ -1,7 +1,6 @@
 """@bruin
 name: raw.sea_level_anomaly
-image: python:3.12
-connection: gcp-prod
+connection: duckdb-dev
 
 materialization:
   type: table
@@ -35,7 +34,7 @@ import zipfile
 from pathlib import Path
 
 import cdsapi
-import pandas as pd
+# import pandas as pd
 import xarray as xr
 
 warnings.filterwarnings("ignore")
@@ -69,7 +68,8 @@ def materialize():
         with zipfile.ZipFile(zip_path) as zf:
             zf.extractall(nc_dir)
 
-        ds = xr.open_mfdataset(sorted(nc_dir.glob("*.nc")), combine="by_coords")
+        nc_files = sorted(nc_dir.glob("*.nc"))
+        ds = xr.open_dataset(nc_files[0], engine="netcdf4")
 
         df = ds["sla"].to_dataframe().reset_index()
         df = df.dropna(subset=["sla"])

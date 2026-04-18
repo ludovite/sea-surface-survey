@@ -1,0 +1,61 @@
+attrs==26.1.0
+    # via ecmwf-datastores-client
+cdsapi==0.7.7
+    # via -r requirements.txt
+certifi==2026.2.25
+    # via
+    #   netcdf4
+    #   requests
+cftime==1.6.5
+    # via netcdf4
+charset-normalizer==3.4.7
+    # via requests
+ecmwf-datastores-client==0.5.1
+    # via cdsapi
+idna==3.11
+    # via requests
+multiurl==0.3.7
+    # via ecmwf-datastores-client
+netcdf4==1.7.4
+    # via -r requirements.txt
+numpy==2.4.4
+    # via
+    #   -r requirements.txt
+    #   cftime
+    #   netcdf4
+    #   pandas
+    #   scipy
+    #   xarray
+packaging==26.1
+    # via xarray
+pandas==3.0.2
+    # via
+    #   -r requirements.txt
+    #   xarray
+pyarrow==23.0.1
+    # via -r requirements.txt
+python-dateutil==2.9.0.post0
+    # via
+    #   multiurl
+    #   pandas
+pytz==2026.1.post1
+    # via multiurl
+requests==2.33.1
+    # via
+    #   cdsapi
+    #   ecmwf-datastores-client
+    #   multiurl
+scipy==1.17.1
+    # via -r requirements.txt
+six==1.17.0
+    # via python-dateutil
+tqdm==4.67.3
+    # via
+    #   cdsapi
+    #   multiurl
+typing-extensions==4.15.0
+    # via ecmwf-datastores-client
+urllib3==2.6.3
+    # via requests
+xarray==2026.4.0
+    # via -r requirements.txt
