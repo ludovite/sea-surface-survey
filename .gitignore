@@ -5,6 +5,14 @@ build/
 dist/
 wheels/
 *.egg-info
+CLAUDE.md
 
 # Virtual environments
 .venv
+
+# Project
+data/
+.envrc
+
+# Bruin (contains credentials)
+.bruin.yml
