@@ -1,0 +1,12 @@
+id: sea-surface-survey
+schedule: monthly
+start_date: "1993-01-01"
+
+default_connections:
+  google_cloud_platform: "gcp-prod"
+  duckdb: "duckdb-dev"
+  gcs: "gcs-data-lake"
+
+default:
+  secrets:
+    - key: CDS_API_KEY
