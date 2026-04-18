@@ -1,6 +1,6 @@
 """@bruin
 name: raw.sea_surface_temperature
-connection: duckdb-dev
+connection: warehouse
 
 materialization:
   type: table
@@ -38,12 +38,12 @@ from pathlib import Path
 
 import cdsapi
 import numpy as np
-# import pandas as pd
 import xarray as xr
 
 warnings.filterwarnings("ignore")
 
 DATASET = "satellite-sea-surface-temperature"
+CACHE_DIR = Path(__file__).parents[2] / "data" / "cache" / "sst"
 
 # Target grid: identical to the SLA 0.25° grid
 TARGET_LAT = np.arange(-89.875, 90.0, 0.25)
@@ -55,28 +55,31 @@ def materialize():
     year = start_date[:4]
     month = start_date[5:7]
 
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cached_zip = CACHE_DIR / f"{year}_{month}.zip"
+
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        zip_path = tmp / "sst.zip"
         nc_dir = tmp / "nc"
         nc_dir.mkdir()
 
-        client = cdsapi.Client(quiet=True)
-        client.retrieve(
-            DATASET,
-            {
-                "variable": "all",
-                "version": "3_0",
-                "processinglevel": "level_4",
-                "sensor_on_satellite": "combined_product",
-                "temporal_resolution": "monthly",
-                "year": [year],
-                "month": [month],
-            },
-            target=str(zip_path),
-        )
+        if not cached_zip.exists():
+            client = cdsapi.Client(quiet=True)
+            client.retrieve(
+                DATASET,
+                {
+                    "variable": "all",
+                    "version": "3_0",
+                    "processinglevel": "level_4",
+                    "sensor_on_satellite": "combined_product",
+                    "temporal_resolution": "monthly",
+                    "year": [year],
+                    "month": [month],
+                },
+                target=str(cached_zip),
+            )
 
-        with zipfile.ZipFile(zip_path) as zf:
+        with zipfile.ZipFile(cached_zip) as zf:
             zf.extractall(nc_dir)
 
         nc_files = sorted(nc_dir.glob("*.nc"))

@@ -9,7 +9,8 @@ description: >
 
 materialization:
   type: table
-  strategy: create+replace
+  strategy: delete+insert
+  incremental_key: year_month
 
 columns:
   - name: year_month

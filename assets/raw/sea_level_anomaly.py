@@ -1,6 +1,6 @@
 """@bruin
 name: raw.sea_level_anomaly
-connection: duckdb-dev
+connection: warehouse
 
 materialization:
   type: table
@@ -34,12 +34,12 @@ import zipfile
 from pathlib import Path
 
 import cdsapi
-# import pandas as pd
 import xarray as xr
 
 warnings.filterwarnings("ignore")
 
 DATASET = "satellite-sea-level-global"
+CACHE_DIR = Path(__file__).parents[2] / "data" / "cache" / "sla"
 
 
 def materialize():
@@ -47,25 +47,28 @@ def materialize():
     year = start_date[:4]
     month = start_date[5:7]
 
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cached_zip = CACHE_DIR / f"{year}_{month}.zip"
+
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        zip_path = tmp / "sla.zip"
         nc_dir = tmp / "nc"
         nc_dir.mkdir()
 
-        client = cdsapi.Client(quiet=True)
-        client.retrieve(
-            DATASET,
-            {
-                "variable": "monthly_mean",
-                "year": [year],
-                "month": [month],
-                "version": "vdt2024",
-            },
-            target=str(zip_path),
-        )
+        if not cached_zip.exists():
+            client = cdsapi.Client(quiet=True)
+            client.retrieve(
+                DATASET,
+                {
+                    "variable": "monthly_mean",
+                    "year": [year],
+                    "month": [month],
+                    "version": "vdt2024",
+                },
+                target=str(cached_zip),
+            )
 
-        with zipfile.ZipFile(zip_path) as zf:
+        with zipfile.ZipFile(cached_zip) as zf:
             zf.extractall(nc_dir)
 
         nc_files = sorted(nc_dir.glob("*.nc"))

@@ -22,3 +22,5 @@ data/
 logs/runs
 logs/*.log
 *.py[cod]bruin_history.db
+
+*.py[cod]
