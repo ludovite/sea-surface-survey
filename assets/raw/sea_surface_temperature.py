@@ -2,6 +2,7 @@
 name: raw.sea_surface_temperature_to_gcs
 tags:
   - ingestion
+instance: "b1.xlarge"
 
 secrets:
   - key: CDS_API_KEY
