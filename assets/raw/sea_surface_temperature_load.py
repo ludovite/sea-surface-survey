@@ -89,5 +89,13 @@ def materialize():
         load_job.result()
         print(f"Loaded {uri} into {table_id}")
 
-    # Return empty DataFrame — BigQuery Load Job already handled the ingestion
-    return pd.DataFrame(columns=["year", "month", "latitude", "longitude", "sst_celsius", "sea_ice_fraction"])
+    # Return empty DataFrame with explicit dtypes — BigQuery Load Job already handled the ingestion.
+    # Correct dtypes prevent Bruin from recreating the table with STRING columns.
+    return pd.DataFrame({
+        "year":             pd.Series(dtype="int32"),
+        "month":            pd.Series(dtype="int32"),
+        "latitude":         pd.Series(dtype="float32"),
+        "longitude":        pd.Series(dtype="float32"),
+        "sst_celsius":      pd.Series(dtype="float32"),
+        "sea_ice_fraction": pd.Series(dtype="float32"),
+    })
