@@ -51,7 +51,7 @@ def _fetch_month(year: int, month: str) -> pd.DataFrame:
         nc_dir.mkdir()
 
         if not cached_zip.exists():
-            client = cdsapi.Client(quiet=True)
+            client = cdsapi.Client(quiet=True, key=os.environ["CDS_API_KEY"], url="https://cds.climate.copernicus.eu/api")
             client.retrieve(
                 DATASET,
                 {
