@@ -1,0 +1,22 @@
+attrs:
+  figure:
+    background_fill_color: "#24273a"
+    border_fill_color:     "#1e2030"
+    outline_line_color:    "#363a4f"
+  Grid:
+    grid_line_color: "#363a4f"
+    grid_line_alpha: 0.6
+  Axis:
+    axis_line_color:        "#5b6078"
+    major_tick_line_color:  "#5b6078"
+    minor_tick_line_color:  "#363a4f"
+    major_label_text_color: "#cad3f5"
+    axis_label_text_color:  "#b8c0e0"
+  Legend:
+    background_fill_color: "#1e2030"
+    border_line_color:     "#363a4f"
+    label_text_color:      "#cad3f5"
+  Title:
+    text_color: "#cad3f5"
+  Toolbar:
+    logo: null
