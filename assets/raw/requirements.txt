@@ -1,21 +1,59 @@
 attrs==26.1.0
-    # via ecmwf-datastores-client
+    # via
+    #   -r requirements.txt
+    #   ecmwf-datastores-client
 cdsapi==0.7.7
     # via -r requirements.txt
 certifi==2026.2.25
     # via
+    #   -r requirements.txt
     #   netcdf4
     #   requests
+cffi==2.0.0
+    # via cryptography
 cftime==1.6.5
-    # via netcdf4
+    # via
+    #   -r requirements.txt
+    #   netcdf4
 charset-normalizer==3.4.7
-    # via requests
+    # via
+    #   -r requirements.txt
+    #   requests
+cryptography==46.0.7
+    # via google-auth
 ecmwf-datastores-client==0.5.1
-    # via cdsapi
+    # via
+    #   -r requirements.txt
+    #   cdsapi
+google-api-core==2.30.3
+    # via
+    #   google-cloud-core
+    #   google-cloud-storage
+google-auth==2.49.2
+    # via
+    #   google-api-core
+    #   google-cloud-core
+    #   google-cloud-storage
+google-cloud-core==2.5.1
+    # via google-cloud-storage
+google-cloud-storage==3.10.1
+    # via -r requirements.txt
+google-crc32c==1.8.0
+    # via
+    #   google-cloud-storage
+    #   google-resumable-media
+google-resumable-media==2.8.2
+    # via google-cloud-storage
+googleapis-common-protos==1.74.0
+    # via google-api-core
 idna==3.11
-    # via requests
+    # via
+    #   -r requirements.txt
+    #   requests
 multiurl==0.3.7
-    # via ecmwf-datastores-client
+    # via
+    #   -r requirements.txt
+    #   ecmwf-datastores-client
 netcdf4==1.7.4
     # via -r requirements.txt
 numpy==2.4.4
@@ -27,35 +65,63 @@ numpy==2.4.4
     #   scipy
     #   xarray
 packaging==26.1
-    # via xarray
+    # via
+    #   -r requirements.txt
+    #   xarray
 pandas==3.0.2
     # via
     #   -r requirements.txt
     #   xarray
+proto-plus==1.27.2
+    # via google-api-core
+protobuf==7.34.1
+    # via
+    #   google-api-core
+    #   googleapis-common-protos
+    #   proto-plus
 pyarrow==23.0.1
     # via -r requirements.txt
+pyasn1==0.6.3
+    # via pyasn1-modules
+pyasn1-modules==0.4.2
+    # via google-auth
+pycparser==3.0
+    # via cffi
 python-dateutil==2.9.0.post0
     # via
+    #   -r requirements.txt
     #   multiurl
     #   pandas
 pytz==2026.1.post1
-    # via multiurl
+    # via
+    #   -r requirements.txt
+    #   multiurl
 requests==2.33.1
     # via
+    #   -r requirements.txt
     #   cdsapi
     #   ecmwf-datastores-client
+    #   google-api-core
+    #   google-cloud-storage
     #   multiurl
 scipy==1.17.1
     # via -r requirements.txt
 six==1.17.0
-    # via python-dateutil
+    # via
+    #   -r requirements.txt
+    #   python-dateutil
 tqdm==4.67.3
     # via
+    #   -r requirements.txt
     #   cdsapi
     #   multiurl
 typing-extensions==4.15.0
-    # via ecmwf-datastores-client
+    # via
+    #   -r requirements.txt
+    #   ecmwf-datastores-client
 urllib3==2.6.3
-    # via requests
+    # via
+    #   -r requirements.txt
+    #   requests
 xarray==2026.4.0
     # via -r requirements.txt

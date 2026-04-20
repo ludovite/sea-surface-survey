@@ -16,11 +16,13 @@ columns:
   - name: year_month
     type: DATE
     description: First day of the observation month
+    primary_key: true
   - name: year
     type: INT64
   - name: month
     type: INT64
   - name: latitude_zone
+    primary_key: true
     type: STRING
     description: "Latitude zone: Arctic (≥66.5°), N. Temperate (23.5–66.5°), Tropical (±23.5°), S. Temperate (-66.5 to -23.5°), Antarctic (≤-66.5°)"
   - name: avg_sla_m

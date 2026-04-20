@@ -15,6 +15,7 @@ columns:
   - name: year_month
     type: DATE
     description: First day of the observation month
+    primary_key: true
   - name: year
     type: INT64
   - name: month
