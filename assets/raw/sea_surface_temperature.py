@@ -74,8 +74,8 @@ def _fetch_month(year: int, month: str) -> pd.DataFrame:
         df = ds.to_dataframe().reset_index()
         df = df.dropna(subset=["analysed_sst"])
         df = df.rename(columns={"analysed_sst": "sst_celsius"})
-        df["year"] = year
-        df["month"] = int(month)
+        df["year"] = pd.array([year] * len(df), dtype="int32")
+        df["month"] = pd.array([int(month)] * len(df), dtype="int32")
         return df[["year", "month", "latitude", "longitude", "sst_celsius", "sea_ice_fraction"]]
 
 

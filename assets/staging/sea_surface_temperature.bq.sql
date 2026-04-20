@@ -32,9 +32,9 @@ depends:
 @bruin */
 
 SELECT
-    DATE(year, month, 1)                        AS year_month,
-    year,
-    month,
+    DATE(CAST(year AS INT64), CAST(month AS INT64), 1) AS year_month,
+    CAST(year AS INT64)                                AS year,
+    CAST(month AS INT64)                               AS month,
     ROUND(latitude  / 0.25) * 0.25             AS latitude,
     ROUND(longitude / 0.25) * 0.25             AS longitude,
     AVG(sst_celsius)                            AS sst_celsius,
