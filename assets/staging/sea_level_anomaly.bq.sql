@@ -1,28 +1,27 @@
 /* @bruin
 name: staging.sea_level_anomaly
-type: duckdb.sql
+type: bq.sql
+connection: warehouse
 
 materialization:
-  type: table
-  strategy: delete+insert
-  incremental_key: year_month
+  type: view
 
 columns:
   - name: year_month
     type: DATE
     description: First day of the observation month
   - name: year
-    type: INTEGER
+    type: INT64
   - name: month
-    type: INTEGER
+    type: INT64
   - name: latitude
-    type: FLOAT
+    type: FLOAT64
     description: Latitude, 0.25° grid
   - name: longitude
-    type: FLOAT
+    type: FLOAT64
     description: Longitude, 0.25° grid
   - name: sea_level_anomaly_m
-    type: FLOAT
+    type: FLOAT64
     description: Sea level anomaly in metres
 
 depends:
@@ -30,13 +29,10 @@ depends:
 @bruin */
 
 SELECT
-    MAKE_DATE(year, month, 1)                           AS year_month,
+    DATE(year, month, 1)     AS year_month,
     year,
     month,
     latitude,
     longitude,
     sea_level_anomaly_m
-FROM "sea-survey".raw.sea_level_anomaly
-WHERE
-    year  = EXTRACT(year  FROM CAST('{{ start_date }}' AS DATE))
-    AND month = EXTRACT(month FROM CAST('{{ start_date }}' AS DATE))
+FROM raw.sea_level_anomaly

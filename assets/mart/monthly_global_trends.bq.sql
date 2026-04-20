@@ -1,6 +1,6 @@
 /* @bruin
 name: mart.monthly_global_trends
-type: duckdb.sql
+type: bq.sql
 
 description: >
   Global monthly averages of sea level anomaly and sea surface temperature.
@@ -16,23 +16,24 @@ columns:
     type: DATE
     description: First day of the observation month
   - name: year
-    type: INTEGER
+    type: INT64
   - name: month
-    type: INTEGER
+    type: INT64
   - name: avg_sla_m
-    type: FLOAT
+    type: FLOAT64
     description: Global average sea level anomaly in metres
   - name: avg_sst_celsius
-    type: FLOAT
+    type: FLOAT64
     description: Global average sea surface temperature in °C
   - name: avg_sea_ice_fraction
-    type: FLOAT
+    type: FLOAT64
     description: Global average sea ice fraction (0–1)
   - name: grid_points
-    type: INTEGER
+    type: INT64
     description: Number of ocean grid points contributing to the averages
 
 depends:
+  - setup.init_mart_tables
   - staging.sea_level_anomaly
   - staging.sea_surface_temperature
 @bruin */
@@ -45,11 +46,8 @@ SELECT
     AVG(sst.sst_celsius)          AS avg_sst_celsius,
     AVG(sst.sea_ice_fraction)     AS avg_sea_ice_fraction,
     COUNT(*)                      AS grid_points
-FROM "sea-survey".staging.sea_level_anomaly AS sla
-INNER JOIN "sea-survey".staging.sea_surface_temperature AS sst
+FROM staging.sea_level_anomaly AS sla
+INNER JOIN staging.sea_surface_temperature AS sst
     USING (year_month, latitude, longitude)
-WHERE sla.year_month = CAST('{{ start_date }}' AS DATE)
-GROUP BY
-    sla.year_month,
-    sla.year,
-    sla.month
+WHERE sla.year_month BETWEEN CAST('{{ start_date }}' AS DATE) AND CAST('{{ end_date }}' AS DATE)
+GROUP BY 1, 2, 3

@@ -23,7 +23,17 @@ resource "google_storage_bucket" "gcs-bucket" {
   }
 }
 
-resource "google_bigquery_dataset" "bq_dataset" {
-  dataset_id = var.bq_dataset_name
+resource "google_bigquery_dataset" "raw" {
+  dataset_id = "raw"
+  location   = var.region
+}
+
+resource "google_bigquery_dataset" "staging" {
+  dataset_id = "staging"
+  location   = var.region
+}
+
+resource "google_bigquery_dataset" "mart" {
+  dataset_id = "mart"
   location   = var.region
 }

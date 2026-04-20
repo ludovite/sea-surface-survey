@@ -13,7 +13,3 @@ variable "gcs_bucket_name" {
   type        = string
 }
 
-variable "bq_dataset_name" {
-  description = "BigQuery dataset ID (set via TF_VAR_bq_dataset_name / GCP_DATASET)"
-  type        = string
-}

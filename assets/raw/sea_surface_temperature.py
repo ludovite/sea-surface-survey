@@ -1,6 +1,8 @@
 """@bruin
 name: raw.sea_surface_temperature
 connection: warehouse
+tags:
+  - ingestion
 
 materialization:
   type: table
@@ -34,10 +36,12 @@ import os
 import tempfile
 import warnings
 import zipfile
+from datetime import date
 from pathlib import Path
 
 import cdsapi
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 warnings.filterwarnings("ignore")
@@ -50,12 +54,17 @@ TARGET_LAT = np.arange(-89.875, 90.0, 0.25)
 TARGET_LON = np.arange(-179.875, 180.0, 0.25)
 
 
-def materialize():
-    start_date = os.environ["BRUIN_START_DATE"]  # YYYY-MM-DD
-    year = start_date[:4]
-    month = start_date[5:7]
+def _iter_months(start: date, end: date):
+    current = date(start.year, start.month, 1)
+    stop = date(end.year, end.month, 1)
+    while current <= stop:
+        yield current.year, f"{current.month:02d}"
+        month = current.month % 12 + 1
+        year = current.year + (current.month == 12)
+        current = date(year, month, 1)
 
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+def _fetch_month(year: int, month: str) -> pd.DataFrame:
     cached_zip = CACHE_DIR / f"{year}_{month}.zip"
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -73,7 +82,7 @@ def materialize():
                     "processinglevel": "level_4",
                     "sensor_on_satellite": "combined_product",
                     "temporal_resolution": "monthly",
-                    "year": [year],
+                    "year": [str(year)],
                     "month": [month],
                 },
                 target=str(cached_zip),
@@ -96,7 +105,16 @@ def materialize():
         df = ds.to_dataframe().reset_index()
         df = df.dropna(subset=["analysed_sst"])
         df = df.rename(columns={"analysed_sst": "sst_celsius"})
-        df["year"] = int(year)
+        df["year"] = year
         df["month"] = int(month)
-
         return df[["year", "month", "latitude", "longitude", "sst_celsius", "sea_ice_fraction"]]
+
+
+def materialize():
+    start = date.fromisoformat(os.environ["BRUIN_START_DATE"])
+    end = date.fromisoformat(os.environ["BRUIN_END_DATE"])
+
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+    frames = [_fetch_month(y, m) for y, m in _iter_months(start, end)]
+    return pd.concat(frames, ignore_index=True)
