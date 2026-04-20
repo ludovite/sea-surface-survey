@@ -24,16 +24,19 @@ resource "google_storage_bucket" "gcs-bucket" {
 }
 
 resource "google_bigquery_dataset" "raw" {
-  dataset_id = "raw"
-  location   = var.region
+  dataset_id                 = "raw"
+  location                   = var.region
+  delete_contents_on_destroy = true
 }
 
 resource "google_bigquery_dataset" "staging" {
-  dataset_id = "staging"
-  location   = var.region
+  dataset_id                 = "staging"
+  location                   = var.region
+  delete_contents_on_destroy = true
 }
 
 resource "google_bigquery_dataset" "mart" {
-  dataset_id = "mart"
-  location   = var.region
+  dataset_id                 = "mart"
+  location                   = var.region
+  delete_contents_on_destroy = true
 }
