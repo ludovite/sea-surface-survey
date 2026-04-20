@@ -4,13 +4,15 @@ A batch data engineering pipeline that ingests global ocean surface data from ES
 
 ## Problem Description
 
-Sea level anomaly (SLA) and sea surface temperature (SST) are two of the most critical indicators of climate change. Both are measured monthly by ESA satellites since 1993 at global scale with sub-degree spatial resolution — but the raw NetCDF files from Copernicus are large, format-specific, and impractical to query directly.
+Can we measure the acceleration of climate change from 30 years of satellite data? This project answers three questions: (1) how fast are global ocean temperatures and sea levels rising? (2) is the rise accelerating? (3) which latitude zones drive the signal?
+
+Sea level anomaly (SLA) and sea surface temperature (SST) are two of the most direct indicators of climate change. ESA satellites have measured both monthly since 1993 at global scale — but the raw NetCDF files from Copernicus are large, format-specific, and impractical to query directly.
 
 This project builds a production-ready pipeline that:
 - Downloads monthly satellite observations via the Copernicus CDS API
-- Loads them into a columnar data warehouse (DuckDB for dev, BigQuery for prod)
-- Transforms raw grids into analytical tables aggregated by time and latitude zone
-- Visualises global trends via a 2-tile dashboard
+- Stores them as Parquet files in a GCS data lake
+- Loads them into BigQuery and transforms raw grids into analytical tables aggregated by time and latitude zone
+- Visualises global trends and zone-level breakdowns via a 2-tile dashboard
 
 ## Architecture
 
