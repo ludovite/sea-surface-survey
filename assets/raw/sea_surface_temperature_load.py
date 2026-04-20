@@ -20,11 +20,9 @@ columns:
   - name: latitude
     type: FLOAT
     description: Latitude in degrees (-90 to 90), 0.25° grid (regridded from 0.05°)
-    primary_key: true
   - name: longitude
     type: FLOAT
     description: Longitude in degrees (-180 to 180), 0.25° grid (regridded from 0.05°)
-    primary_key: true
   - name: sst_celsius
     type: FLOAT
     description: Sea surface temperature in °C (converted from Kelvin, ESA SST CCI L4)

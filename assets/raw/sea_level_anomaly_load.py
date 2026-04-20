@@ -20,11 +20,9 @@ columns:
   - name: latitude
     type: FLOAT
     description: Latitude in degrees (-90 to 90), 0.25° grid
-    primary_key: true
   - name: longitude
     type: FLOAT
     description: Longitude in degrees (-180 to 180), 0.25° grid
-    primary_key: true
   - name: sea_level_anomaly_m
     type: FLOAT
     description: Sea level anomaly relative to reference climatology, in metres (SLA)
