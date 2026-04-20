@@ -19,10 +19,10 @@ columns:
     primary_key: true
   - name: latitude
     type: FLOAT
-    description: Latitude in degrees (-90 to 90), 0.25° grid (regridded from 0.05°)
+    description: Latitude in degrees (-90 to 90), native 0.05° grid
   - name: longitude
     type: FLOAT
-    description: Longitude in degrees (-180 to 180), 0.25° grid (regridded from 0.05°)
+    description: Longitude in degrees (-180 to 180), native 0.05° grid
   - name: sst_celsius
     type: FLOAT
     description: Sea surface temperature in °C (converted from Kelvin, ESA SST CCI L4)
@@ -49,7 +49,6 @@ from io import BytesIO
 from pathlib import Path
 
 import cdsapi
-import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -58,9 +57,6 @@ warnings.filterwarnings("ignore")
 DATASET = "satellite-sea-surface-temperature"
 CACHE_DIR = Path(__file__).parents[2] / "data" / "cache" / "sst"
 GCS_PREFIX = "raw/sea_surface_temperature"
-
-TARGET_LAT = np.arange(-89.875, 90.0, 0.25)
-TARGET_LON = np.arange(-179.875, 180.0, 0.25)
 
 
 def _iter_months(start: date, end: date):
@@ -104,7 +100,6 @@ def _fetch_month_cds(year: int, month: str) -> pd.DataFrame:
         ds = xr.open_dataset(nc_files[0], engine="netcdf4")
         ds = ds[["analysed_sst", "sea_ice_fraction"]]
         ds = ds.rename({"lat": "latitude", "lon": "longitude"})
-        ds = ds.interp(latitude=TARGET_LAT, longitude=TARGET_LON, method="linear")
         ds["analysed_sst"] = ds["analysed_sst"] - 273.15
         df = ds.to_dataframe().reset_index()
         df = df.dropna(subset=["analysed_sst"])
