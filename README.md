@@ -227,14 +227,29 @@ The dashboard is a **Streamlit + Bokeh** app hosted on [Hugging Face Spaces](htt
 ```
 .
 ├── assets/
-│   ├── raw/            Python ingest assets (CDS API → GCS → BigQuery)
-│   ├── staging/        SQL cleaning and regridding assets
-│   ├── mart/           SQL analytical assets
-│   └── setup/          DDL assets (table creation with partitioning)
-├── streamlit-app/      Dashboard (Streamlit + Bokeh, deployed on HF Spaces)
-├── terraform/          GCS bucket + BigQuery datasets
-├── tests/              pytest suite (DuckDB, no GCP required)
-├── Makefile            Common commands (dev, prod, test, infra-up/down, dashboard)
-├── pipeline.yml        Bruin pipeline definition
-└── pyproject.toml      Python dependencies
+│   ├── raw/                    Python ingest assets (CDS API → GCS → BigQuery)
+│   │   ├── sea_level_anomaly.py           GCS upload asset
+│   │   ├── sea_level_anomaly_load.py      BigQuery load asset
+│   │   ├── sea_surface_temperature.py     GCS upload asset
+│   │   ├── sea_surface_temperature_load.py  BigQuery load asset
+│   │   └── requirements.txt              Bruin-managed lockfile
+│   ├── staging/                SQL cleaning and regridding assets
+│   ├── mart/                   SQL analytical assets
+│   └── setup/                  DDL assets (table creation with partitioning)
+├── streamlit-app/              Dashboard (Streamlit + Bokeh, deployed on HF Spaces)
+│   ├── utils/
+│   │   ├── bq_client.py        BigQuery connection + cached query helper
+│   │   └── charts.py           Bokeh chart functions
+│   ├── themes/                 Catppuccin Macchiato Bokeh theme
+│   ├── app.py                  Streamlit entry point
+│   └── requirements.txt        Dashboard dependencies
+├── terraform/                  GCS bucket + BigQuery datasets
+├── tests/                      pytest suite (DuckDB, no GCP required)
+│   ├── conftest.py             In-memory DuckDB fixtures
+│   ├── test_transformations.py SQL regridding and zone boundary tests
+│   └── test_mart.py            Mart JOIN invariant tests
+├── .bruin.yml                  Pipeline environments (dev: DuckDB, prod: BigQuery)
+├── Makefile                    Common commands (dev, prod, test, infra-up/down, dashboard)
+├── pipeline.yml                Bruin pipeline definition
+└── pyproject.toml              Python dependencies
 ```
