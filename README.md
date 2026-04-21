@@ -92,7 +92,7 @@ Create `.envrc` (gitignored) with the following variables:
 # Find your UID and token at https://cds.climate.copernicus.eu/profile
 export CDS_API_KEY="<uid>:<token>"
 
-# GCP (prod only)
+# GCP (prod only) — path to your service account JSON key file
 export GOOGLE_CREDENTIALS="$HOME/.config/creds/<your-sa>.json"
 export GOOGLE_APPLICATION_CREDENTIALS="$GOOGLE_CREDENTIALS"
 export PROJECT_NAME="<gcp-project-id>"
@@ -120,6 +120,8 @@ terraform apply
 ### 4. Run the pipeline
 
 All pipeline commands are available via `make`. Default date range: 1993-01-01 → 2023-12-31.
+
+> **Unix only:** `make prod` creates a `.gcp-credentials.json` symlink pointing to `$GOOGLE_CREDENTIALS` before calling Bruin. This requires a Unix shell (`ln -sf`). Windows users should create the symlink manually or use WSL.
 
 ```bash
 make dev                                  # DuckDB, full backfill

@@ -18,10 +18,10 @@ environments:
         - name: "warehouse"
           project_id: "${PROJECT_NAME}"
           location: "${GCP_LOCATION}"
-          service_account_file: "${GOOGLE_CREDENTIALS}"
+          service_account_file: ".gcp-credentials.json"
       gcs:
         - name: "gcs-data-lake"
-          service_account_file: "${GOOGLE_CREDENTIALS}"
+          service_account_file: ".gcp-credentials.json"
           bucket_name: "${GCP_BUCKET}"
       generic:
         - name: "CDS_API_KEY"

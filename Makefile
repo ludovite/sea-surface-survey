@@ -11,7 +11,8 @@ dev: ## Run ingestion pipeline locally (DuckDB). Override dates: make dev START=
 	mkdir -p data
 	bruin run . --tag ingestion --start-date "$(START)" --end-date "$(END)"
 
-prod: ## Run pipeline on GCP (BigQuery + GCS). make prod START=... END=...
+prod: ## Run pipeline on GCP (BigQuery + GCS). make prod START=... END=... (default 1993-01-01 → 2023-12-31)
+	ln -sf "$(GOOGLE_CREDENTIALS)" .gcp-credentials.json
 	bruin run . --environment prod --force --start-date "$(START)" --end-date "$(END)"
 
 validate: ## Validate pipeline assets
