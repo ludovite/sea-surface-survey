@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS staging.sea_surface_temperature (
     longitude        FLOAT64,
     sst_celsius      FLOAT64,
     sea_ice_fraction FLOAT64
-);
+)
+PARTITION BY year_month
+CLUSTER BY year, month;
 
 CREATE TABLE IF NOT EXISTS mart.monthly_global_trends (
     year_month           DATE,
@@ -22,7 +24,9 @@ CREATE TABLE IF NOT EXISTS mart.monthly_global_trends (
     avg_sst_celsius      FLOAT64,
     avg_sea_ice_fraction FLOAT64,
     grid_points          INT64
-);
+)
+PARTITION BY year_month
+CLUSTER BY year, month;
 
 CREATE TABLE IF NOT EXISTS mart.latitude_zone_stats (
     year_month           DATE,
@@ -33,4 +37,6 @@ CREATE TABLE IF NOT EXISTS mart.latitude_zone_stats (
     avg_sst_celsius      FLOAT64,
     avg_sea_ice_fraction FLOAT64,
     grid_points          INT64
-);
+)
+PARTITION BY year_month
+CLUSTER BY latitude_zone;

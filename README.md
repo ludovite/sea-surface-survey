@@ -164,6 +164,14 @@ bruin-viz serve     # open http://localhost:8001
 | `staging.*` | `delete+insert` on `year_month` | Replaces a month on re-run |
 | `mart.*` | `delete+insert` on `year_month` | Replaces a month on re-run |
 
+### BigQuery partitioning & clustering
+
+| Table | Partition | Cluster | Rationale |
+|---|---|---|---|
+| `staging.sea_surface_temperature` | `year_month` | `year, month` | Partition aligns with `delete+insert` (one month updated per run); clustering speeds up the monthly GROUP BY aggregation |
+| `mart.monthly_global_trends` | `year_month` | `year, month` | Dashboard time-range queries prune to relevant partitions; clustering eliminates full scans on year/month filters |
+| `mart.latitude_zone_stats` | `year_month` | `latitude_zone` | Same partition benefit; clustering on zone matches the dashboard's group-by-zone queries |
+
 ### Local CDS cache
 
 Downloaded zip files are cached under `data/cache/sla/` and `data/cache/sst/` (gitignored). Re-running a month that was already downloaded skips the API call entirely.
