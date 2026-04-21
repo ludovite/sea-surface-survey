@@ -4,7 +4,9 @@ type: bq.sql
 connection: warehouse
 
 materialization:
-  type: view
+  type: table
+  strategy: delete+insert
+  incremental_key: year_month
 
 columns:
   - name: year_month
@@ -28,6 +30,7 @@ columns:
     description: Sea ice fraction (0–1), averaged over 0.25° cell
 
 depends:
+  - setup.init_mart_tables
   - raw.sea_surface_temperature
 @bruin */
 

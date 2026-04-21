@@ -2,11 +2,13 @@
 title: Sea Surface Survey
 emoji: 🌊
 colorFrom: blue
-colorTo: cyan
+colorTo: indigo
 sdk: streamlit
 sdk_version: 1.45.0
 app_file: app.py
 pinned: false
+short_description: sea level anomaly & sea surface temperature trends
+license: mit
 ---
 
 # Sea Surface Survey Dashboard

@@ -8,7 +8,7 @@ from bokeh.models import ColumnDataSource, FactorRange, HoverTool, LinearAxis, R
 from bokeh.plotting import figure
 from bokeh.themes import Theme
 
-from utils.bq_client import query
+from utils.bq_client import project_id, query
 
 curdoc().theme = Theme(
     filename=Path(__file__).parents[1] / "themes" / "catppuccin_macchiato.yaml"
@@ -29,9 +29,9 @@ _ZONE_COLORS = dict(zip(_ZONES, [_SKY, _BLUE, _PEACH, _GREEN, _MAUVE]))
 
 def chart_trends() -> figure:
     """Q1: how fast are SLA and SST rising globally?"""
-    df = query("""
+    df = query(f"""
         SELECT year_month, avg_sla_m, avg_sst_celsius
-        FROM mart.monthly_global_trends
+        FROM `{project_id()}.mart.monthly_global_trends`
         ORDER BY year_month
     """)
     df["year_month"] = pd.to_datetime(df["year_month"])
@@ -74,7 +74,7 @@ def chart_trends() -> figure:
 
 def chart_decades():
     """Q2: is the rise accelerating? Decadal averages for SLA and SST."""
-    df = query("""
+    df = query(f"""
         SELECT
             CASE
                 WHEN year BETWEEN 1993 AND 2002 THEN '1993-2002'
@@ -83,7 +83,7 @@ def chart_decades():
             END AS decade,
             AVG(avg_sla_m)       AS avg_sla_m,
             AVG(avg_sst_celsius) AS avg_sst_celsius
-        FROM mart.monthly_global_trends
+        FROM `{project_id()}.mart.monthly_global_trends`
         GROUP BY decade
         ORDER BY decade
     """)
@@ -111,9 +111,9 @@ def chart_decades():
 
 def chart_zones() -> figure:
     """Q3: which latitude zones drive the warming signal?"""
-    df = query("""
+    df = query(f"""
         SELECT year_month, latitude_zone, avg_sst_celsius
-        FROM mart.latitude_zone_stats
+        FROM `{project_id()}.mart.latitude_zone_stats`
         ORDER BY year_month
     """)
     df["year_month"] = pd.to_datetime(df["year_month"])

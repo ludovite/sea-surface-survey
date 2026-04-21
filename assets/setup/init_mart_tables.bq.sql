@@ -4,6 +4,16 @@ type: bq.sql
 connection: warehouse
 @bruin */
 
+CREATE TABLE IF NOT EXISTS staging.sea_surface_temperature (
+    year_month       DATE,
+    year             INT64,
+    month            INT64,
+    latitude         FLOAT64,
+    longitude        FLOAT64,
+    sst_celsius      FLOAT64,
+    sea_ice_fraction FLOAT64
+);
+
 CREATE TABLE IF NOT EXISTS mart.monthly_global_trends (
     year_month           DATE,
     year                 INT64,

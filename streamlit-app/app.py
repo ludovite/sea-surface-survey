@@ -17,16 +17,25 @@ st.caption(
 st.divider()
 
 st.subheader("Q1 — How fast are global ocean temperatures and sea levels rising?")
-st.bokeh_chart(chart_trends(), use_container_width=True)
+try:
+    st.bokeh_chart(chart_trends(), use_container_width=True)
+except Exception as e:
+    st.warning(f"Chart unavailable: {e}")
 
 st.divider()
 
 st.subheader("Q2 — Is the rise accelerating?")
 st.caption("Decadal averages — each bar represents the mean over a 10-year period.")
-st.bokeh_chart(chart_decades(), use_container_width=True)
+try:
+    st.bokeh_chart(chart_decades(), use_container_width=True)
+except Exception as e:
+    st.warning(f"Chart unavailable: {e}")
 
 st.divider()
 
 st.subheader("Q3 — Which latitude zones drive the signal?")
 st.caption("Click a zone in the legend to show/hide it.")
-st.bokeh_chart(chart_zones(), use_container_width=True)
+try:
+    st.bokeh_chart(chart_zones(), use_container_width=True)
+except Exception as e:
+    st.warning(f"Chart unavailable: {e}")

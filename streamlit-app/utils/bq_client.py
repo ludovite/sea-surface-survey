@@ -7,10 +7,18 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 
 
+def _sa_info() -> dict:
+    return json.loads(os.environ["GCP_SA_JSON"])
+
+
 def _client() -> bigquery.Client:
-    sa_info = json.loads(os.environ["GCP_SA_JSON"])
+    sa_info = _sa_info()
     credentials = service_account.Credentials.from_service_account_info(sa_info)
     return bigquery.Client(credentials=credentials, project=sa_info["project_id"])
+
+
+def project_id() -> str:
+    return _sa_info()["project_id"]
 
 
 @st.cache_data(ttl=3600)
