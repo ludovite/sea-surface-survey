@@ -119,26 +119,32 @@ terraform apply
 
 ### 4. Run the pipeline
 
-**Dev — single month (DuckDB):**
+All pipeline commands are available via `make`. Default date range: 1993-01-01 → 2023-12-31.
+
+```bash
+make dev                                  # DuckDB, full backfill
+make dev START=1993-01-01 END=1993-03-31  # DuckDB, custom range
+make prod                                 # BigQuery + GCS, full backfill
+make validate                             # Validate all assets
+```
+
+Or directly with Bruin:
 
 ```bash
 mkdir -p data
 bruin run . --start-date "1993-01-01" --end-date "1993-01-31"
-```
-
-**Prod — single month (BigQuery + GCS):**
-
-```bash
-bruin run . --environment prod --force --start-date "1993-01-01" --end-date "1993-01-31"
-```
-
-**Prod — backfill multiple months:**
-
-```bash
 bruin run . --environment prod --force --start-date "1993-01-01" --end-date "1993-06-30"
 ```
 
-### 5. Monitor pipeline runs
+### 5. Run the tests
+
+```bash
+make test          # or: uv run pytest tests/ -v
+```
+
+22 tests cover the SQL regridding logic (`ROUND / AVG`), latitude zone boundaries, and mart JOIN invariants, all running against an in-memory DuckDB fixture (no GCP credentials needed).
+
+### 6. Monitor pipeline runs
 
 `bruin` provides a local pipeline UI (asset graph, run history, row counts):
 
@@ -194,6 +200,8 @@ The dashboard is a **Streamlit + Bokeh** app hosted on [Hugging Face Spaces](htt
 │   └── setup/          DDL assets (table creation with partitioning)
 ├── streamlit-app/      Dashboard (Streamlit + Bokeh, deployed on HF Spaces)
 ├── terraform/          GCS bucket + BigQuery datasets
+├── tests/              pytest suite (DuckDB, no GCP required)
+├── Makefile            Common commands (dev, prod, test, infra-up/down, dashboard)
 ├── pipeline.yml        Bruin pipeline definition
 └── pyproject.toml      Python dependencies
 ```
