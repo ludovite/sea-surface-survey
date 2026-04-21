@@ -3,8 +3,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from bokeh.io import curdoc
-from bokeh.layouts import gridplot
-from bokeh.models import ColumnDataSource, FactorRange, HoverTool, LinearAxis, Range1d
+from bokeh.models import ColumnDataSource, FactorRange, HoverTool, Legend, LegendItem
 from bokeh.plotting import figure
 from bokeh.themes import Theme
 
@@ -27,53 +26,50 @@ _ZONES = ["Arctic", "N. Temperate", "Tropical", "S. Temperate", "Antarctic"]
 _ZONE_COLORS = dict(zip(_ZONES, [_SKY, _BLUE, _PEACH, _GREEN, _MAUVE]))
 
 
-def chart_trends() -> figure:
-    """Q1: how fast are SLA and SST rising globally?"""
+def chart_trends(
+    year_min: int = 1993,
+    year_max: int = 2023,
+    show_trend: bool = True,
+) -> tuple[figure, figure]:
+    """Q1: how fast are SLA and SST rising globally? Returns (fig_sla, fig_sst)."""
     df = query(f"""
         SELECT year_month, avg_sla_m, avg_sst_celsius
         FROM `{project_id()}.mart.monthly_global_trends`
         ORDER BY year_month
     """)
     df["year_month"] = pd.to_datetime(df["year_month"])
+    df = df[(df["year_month"].dt.year >= year_min) & (df["year_month"].dt.year <= year_max)]
+    df["avg_sla_cm"] = df["avg_sla_m"] * 100
+
     x = df["year_month"]
     x_num = (x - x.min()).dt.days.values.astype(float)
 
-    p = figure(
-        x_axis_type="datetime",
-        height=380,
-        title="Q1 — Global ocean trends (1993–2023)",
-        y_axis_label="Sea level anomaly (m)",
-        toolbar_location="above",
-        sizing_mode="stretch_width",
-    )
-    p.extra_y_ranges = {"sst": Range1d(
-        df["avg_sst_celsius"].min() - 0.5,
-        df["avg_sst_celsius"].max() + 0.5,
-    )}
-    p.add_layout(LinearAxis(y_range_name="sst", axis_label="Sea surface temperature (°C)"), "right")
+    def _trend_fig(col, color, title, y_label):
+        p = figure(
+            x_axis_type="datetime",
+            height=350,
+            title=title,
+            y_axis_label=y_label,
+            toolbar_location="above",
+            sizing_mode="stretch_width",
+        )
+        p.line(x, df[col], color=color, alpha=0.6)
+        if show_trend and len(df) > 1:
+            slope, intercept = np.polyfit(x_num, df[col].values, 1)
+            p.line(x, slope * x_num + intercept, color=color, line_dash="dashed", line_width=2)
+        p.add_tools(HoverTool(
+            tooltips=[("date", "@x{%F}"), ("value", "@y{0.00}")],
+            formatters={"@x": "datetime"},
+        ))
+        return p
 
-    p.line(x, df["avg_sla_m"],       color=_BLUE, alpha=0.4, legend_label="SLA (m)")
-    p.line(x, df["avg_sst_celsius"], color=_RED,  alpha=0.4, legend_label="SST (°C)", y_range_name="sst")
-
-    for col, color, yr_name in [
-        ("avg_sla_m",       _BLUE, None),
-        ("avg_sst_celsius", _RED,  "sst"),
-    ]:
-        slope, intercept = np.polyfit(x_num, df[col].values, 1)
-        trend = slope * x_num + intercept
-        kw = {"y_range_name": yr_name} if yr_name else {}
-        p.line(x, trend, color=color, line_dash="dashed", line_width=2, **kw)
-
-    p.legend.location = "top_left"
-    p.add_tools(HoverTool(
-        tooltips=[("date", "@x{%F}"), ("value", "@y{0.0000}")],
-        formatters={"@x": "datetime"},
-    ))
-    return p
+    fig_sla = _trend_fig("avg_sla_cm",      _BLUE, "Sea Level Anomaly (SLA)",       "SLA (cm)")
+    fig_sst = _trend_fig("avg_sst_celsius", _RED,  "Sea Surface Temperature (SST)", "SST (°C)")
+    return fig_sla, fig_sst
 
 
-def chart_decades():
-    """Q2: is the rise accelerating? Decadal averages for SLA and SST."""
+def chart_decades() -> tuple[figure, figure]:
+    """Q2: is the rise accelerating? Returns (fig_sla, fig_sst) bar charts by decade."""
     df = query(f"""
         SELECT
             CASE
@@ -93,7 +89,7 @@ def chart_decades():
         src = ColumnDataSource({"decade": decades, "value": df[col].tolist()})
         p = figure(
             x_range=FactorRange(*decades),
-            height=300,
+            height=320,
             title=title,
             y_axis_label=y_label,
             toolbar_location=None,
@@ -104,9 +100,11 @@ def chart_decades():
         p.xgrid.grid_line_color = None
         return p
 
-    p_sla = _bar("avg_sla_m",       "Sea level anomaly by decade (m)",        _TEAL,  "avg SLA (m)")
-    p_sst = _bar("avg_sst_celsius", "Sea surface temperature by decade (°C)", _PEACH, "avg SST (°C)")
-    return gridplot([[p_sla, p_sst]], sizing_mode="stretch_width")
+    df["avg_sla_cm"] = df["avg_sla_m"] * 100
+    return (
+        _bar("avg_sla_cm",      "Sea Level Anomaly (SLA) by decade",        _TEAL,  "avg SLA (cm)"),
+        _bar("avg_sst_celsius", "Sea Surface Temperature (SST) by decade",  _PEACH, "avg SST (°C)"),
+    )
 
 
 def chart_zones() -> figure:
@@ -120,21 +118,36 @@ def chart_zones() -> figure:
 
     p = figure(
         x_axis_type="datetime",
-        height=380,
-        title="Q3 — SST by latitude zone (1993–2023)",
+        height=220,
+        title="Sea Surface Temperature (SST) by latitude zone",
         y_axis_label="Sea surface temperature (°C)",
         toolbar_location="above",
         sizing_mode="stretch_width",
     )
+
+    legend_items = []
     for zone, color in _ZONE_COLORS.items():
         sub = df[df["latitude_zone"] == zone].sort_values("year_month")
-        p.line(sub["year_month"], sub["avg_sst_celsius"],
-               color=color, line_width=1.5, legend_label=zone)
+        src = ColumnDataSource({"x": sub["year_month"], "y": sub["avg_sst_celsius"], "zone": [zone] * len(sub)})
+        line_r = p.line("x", "y", source=src, color=color, line_width=1.5)
+        sq_r = p.square(
+            [sub["year_month"].iloc[0]], [sub["avg_sst_celsius"].iloc[0]],
+            fill_color=color, line_color=None, size=8, fill_alpha=0.9,
+        )
+        legend_items.append(LegendItem(label=zone, renderers=[sq_r, line_r]))
 
-    p.legend.location = "top_left"
-    p.legend.click_policy = "hide"
+    legend = Legend(
+        items=legend_items,
+        location="top_left",
+        click_policy="hide",
+        background_fill_color="#1e2030",
+        background_fill_alpha=0.92,
+        border_line_color="#363a4f",
+        label_text_color="#cad3f5",
+    )
+    p.add_layout(legend)
     p.add_tools(HoverTool(
-        tooltips=[("date", "@x{%F}"), ("SST", "@y{0.00} °C")],
+        tooltips=[("zone", "@zone"), ("date", "@x{%F}"), ("SST", "@y{0.00} °C")],
         formatters={"@x": "datetime"},
     ))
     return p

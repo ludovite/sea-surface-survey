@@ -64,6 +64,8 @@ Infrastructure is provisioned with **Terraform** (GCS bucket + BigQuery dataset 
 Coverage: global ocean, January 1993 – December 2023 (~360 months).  
 Volume per month: ~570k grid points (SLA) · ~680k grid points (SST).
 
+> **Note:** The Copernicus CDS datasets used here are updated with a delay and currently available up to December 2023. The pipeline is designed for historical backfills only — no real-time or scheduled ingestion.
+
 ## Quickstart
 
 ### Prerequisites
