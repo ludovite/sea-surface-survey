@@ -47,12 +47,12 @@ Infrastructure is provisioned with **Terraform** (GCS bucket + BigQuery dataset 
 | Orchestration | Bruin | Bruin |
 | Data source | Copernicus CDS API | Copernicus CDS API |
 | Warehouse | DuckDB (local file) | Google BigQuery |
-| Data lake / staging | — | Google Cloud Storage |
+| Data lake | — | Google Cloud Storage |
 | Infrastructure | — | Terraform |
 | Transformations | Bruin SQL | Bruin SQL |
-| Dashboard | bruin-viz | Bruin Cloud |
+| Dashboard | — | Streamlit + Bokeh (Hugging Face Spaces) |
 
-**Python stack:** uv · xarray · netcdf4 · scipy · pandas · pyarrow
+**Python stack:** uv · xarray · netcdf4 · pandas · pyarrow
 
 ## Datasets
 
@@ -86,8 +86,9 @@ uv sync
 Create `.envrc` (gitignored) with the following variables:
 
 ```bash
-# Copernicus CDS — path to your ~/.cdsapirc file
-export CDS_API_KEY="$HOME/.cdsapirc"
+# Copernicus CDS API key — format: <UID>:<TOKEN>
+# Find your UID and token at https://cds.climate.copernicus.eu/profile
+export CDS_API_KEY="<uid>:<token>"
 
 # GCP (prod only)
 export GOOGLE_CREDENTIALS="$HOME/.config/creds/<your-sa>.json"
@@ -120,34 +121,24 @@ terraform apply
 
 ```bash
 mkdir -p data
-bruin-viz run . --start-date "1993-01-01" --end-date "1993-01-31"
+bruin run . --start-date "1993-01-01" --end-date "1993-01-31"
 ```
 
-**Dev — backfill multiple months:**
+**Prod — single month (BigQuery + GCS):**
 
 ```bash
-python - << 'EOF'
-import subprocess, calendar
-from datetime import date
-
-start, end = date(1993, 1, 1), date(1994, 12, 1)
-current = start
-while current <= end:
-    last = date(current.year, current.month, calendar.monthrange(current.year, current.month)[1])
-    subprocess.run(['bruin-viz', 'run', '.', '--start-date', str(current), '--end-date', str(last)])
-    current = date(current.year + (current.month == 12), current.month % 12 + 1, 1)
-EOF
+bruin run . --environment prod --force --start-date "1993-01-01" --end-date "1993-01-31"
 ```
 
-**Prod (BigQuery + GCS):**
+**Prod — backfill multiple months:**
 
 ```bash
-bruin run . --environment prod --start-date "1993-01-01" --end-date "1993-01-31"
+bruin run . --environment prod --force --start-date "1993-01-01" --end-date "1993-06-30"
 ```
 
 ### 5. Monitor pipeline runs
 
-`bruin-viz` provides a pipeline dashboard (asset graph, run history, row counts):
+`bruin` provides a local pipeline UI (asset graph, run history, row counts):
 
 ```bash
 bruin-viz parse .   # generate the pipeline graph (run once, or after asset changes)
@@ -178,28 +169,29 @@ Downloaded zip files are cached under `data/cache/sla/` and `data/cache/sst/` (g
 
 ### SST regridding
 
-The SST dataset is delivered at 0.05° resolution (~5 km). It is bilinearly interpolated onto the SLA 0.25° grid using `xarray.interp` (requires scipy) so both datasets share the same spatial keys for joins.
+The SST dataset is delivered at 0.05° resolution (~5 km). It is aggregated to the SLA 0.25° grid in the `staging.sea_surface_temperature` SQL asset using `ROUND(lat / 0.25) * 0.25` + `AVG GROUP BY`, so both datasets share the same spatial keys for joins.
 
 ## Data Dashboard
 
-The analytical dashboard (2 tiles) is served via **Bruin Cloud** and reads from the mart tables:
+The dashboard is a **Streamlit + Bokeh** app hosted on [Hugging Face Spaces](https://huggingface.co/spaces/ludovite/sea-surface-survey). It reads directly from the BigQuery mart tables and answers the three project questions:
 
 | Tile | Table | Description |
 |---|---|---|
-| Global monthly trends | `mart.monthly_global_trends` | Time series of global average SLA and SST |
-| Latitude zone breakdown | `mart.latitude_zone_stats` | Averages by zone (Arctic, N. Temperate, Tropical, S. Temperate, Antarctic) |
-
-> `bruin-viz serve` is a separate pipeline monitoring UI (asset graph, run history, row counts) — it is not the data dashboard.
+| Q1 — Global trends | `mart.monthly_global_trends` | Dual time series of SLA and SST (1993–2023) with linear trend lines |
+| Q2 — Decadal acceleration | `mart.monthly_global_trends` | Average SLA and SST per decade (1993–2002 · 2003–2012 · 2013–2023) |
+| Q3 — Latitude zone breakdown | `mart.latitude_zone_stats` | SST per zone over time (Arctic · N. Temperate · Tropical · S. Temperate · Antarctic) |
 
 ## Repository Structure
 
 ```
 .
 ├── assets/
-│   ├── raw/            Python ingest assets (CDS API → warehouse)
-│   ├── staging/        SQL cleaning assets
-│   └── mart/           SQL analytical assets
-├── terraform/          GCS bucket + BigQuery dataset
+│   ├── raw/            Python ingest assets (CDS API → GCS → BigQuery)
+│   ├── staging/        SQL cleaning and regridding assets
+│   ├── mart/           SQL analytical assets
+│   └── setup/          DDL assets (table creation with partitioning)
+├── streamlit-app/      Dashboard (Streamlit + Bokeh, deployed on HF Spaces)
+├── terraform/          GCS bucket + BigQuery datasets
 ├── pipeline.yml        Bruin pipeline definition
 └── pyproject.toml      Python dependencies
 ```
