@@ -29,10 +29,11 @@ depends:
 @bruin */
 
 SELECT
-    DATE(year, month, 1)     AS year_month,
+    DATE(year, month, 1)                             AS year_month,
     year,
     month,
-    latitude,
-    longitude,
-    sea_level_anomaly_m
+    ROUND(CAST(latitude  AS FLOAT64) / 0.25) * 0.25 AS latitude,
+    ROUND(CAST(longitude AS FLOAT64) / 0.25) * 0.25 AS longitude,
+    AVG(sea_level_anomaly_m)                         AS sea_level_anomaly_m
 FROM raw.sea_level_anomaly
+GROUP BY 1, 2, 3, 4, 5

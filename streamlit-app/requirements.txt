@@ -1,5 +1,6 @@
 streamlit>=1.45.0
 bokeh>=3.6.0
+streamlit-bokeh>=0.1.0
 google-cloud-bigquery>=3.0.0
 google-auth>=2.0.0
 pandas>=2.0.0
