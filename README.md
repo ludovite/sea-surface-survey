@@ -2,6 +2,8 @@
 
 A batch data engineering pipeline that ingests global ocean surface data from ESA satellite observations, transforms it through a multi-layer warehouse, and exposes climate trends on a dashboard.
 
+![World map](Temperature.png)
+
 ## 🔍 Problem Description
 
 Can we measure the acceleration of climate change from 30 years of satellite data? This project answers three questions.
@@ -9,6 +11,8 @@ Can we measure the acceleration of climate change from 30 years of satellite dat
 - How fast are global ocean temperatures and sea levels rising?
 - Is the rise accelerating?
 - Which latitude zones drive the signal?
+
+**Demo [here](https://huggingface.co/spaces/ludovite/sea-surface-survey)**
 
 [Sea level anomaly](https://cds.climate.copernicus.eu/datasets/satellite-sea-level-global?tab=overview) (SLA) and [sea surface temperature](https://cds.climate.copernicus.eu/datasets/satellite-sea-surface-temperature?tab=overview) (SST) are two of the most direct indicators of climate change. ESA satellites have measured both monthly since 1993 at global scale — but the raw NetCDF files from [Copernicus](https://www.copernicus.eu/en) are large, format-specific, and impractical to query directly.
 
