@@ -9,6 +9,8 @@ environments:
       generic:
         - name: "CDS_API_KEY"
           value: "${CDS_API_KEY}"
+        - name: "gcs-data-lake"
+          value: ""
 
   prod:
     connections:

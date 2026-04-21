@@ -7,9 +7,9 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 	  awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
 
-dev: ## Run pipeline locally (DuckDB). Override dates: make dev START=1993-01-01 END=1993-03-31
+dev: ## Run ingestion pipeline locally (DuckDB). Override dates: make dev START=1993-01-01 END=1993-03-31
 	mkdir -p data
-	bruin run . --start-date "$(START)" --end-date "$(END)"
+	bruin run . --tag ingestion --start-date "$(START)" --end-date "$(END)"
 
 prod: ## Run pipeline on GCP (BigQuery + GCS). make prod START=... END=...
 	bruin run . --environment prod --force --start-date "$(START)" --end-date "$(END)"
