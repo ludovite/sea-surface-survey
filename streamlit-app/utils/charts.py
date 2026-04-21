@@ -12,7 +12,9 @@ from bokeh.models import (
     LegendItem,
     LinearColorMapper,
 )
-from bokeh.palettes import Inferno256
+from bokeh.palettes import interp_palette
+
+_BLUE_YELLOW = interp_palette(["#0d1b8e", "#0d6abf", "#00c8ff", "#ffff00"], 256)
 from bokeh.plotting import figure
 from bokeh.themes import Theme
 
@@ -178,7 +180,7 @@ def chart_sst_map(year: int, month: int) -> figure:
     grid[lat_idx, lon_idx] = df["sst_celsius"].values
 
     mapper = LinearColorMapper(
-        palette=Inferno256,
+        palette=_BLUE_YELLOW,
         low=-2.0,
         high=35.0,
         nan_color="#1e2030",
@@ -190,7 +192,7 @@ def chart_sst_map(year: int, month: int) -> figure:
         y_axis_label="Latitude",
         x_range=(-180, 180),
         y_range=(-90, 90),
-        height=380,
+        height=260,
         toolbar_location="above",
         sizing_mode="stretch_width",
     )
