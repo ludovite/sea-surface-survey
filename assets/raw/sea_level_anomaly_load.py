@@ -80,16 +80,19 @@ def _fetch_month_cds(year: int, month: str) -> pd.DataFrame:
                 key=os.environ["CDS_API_KEY"],
                 url="https://cds.climate.copernicus.eu/api",
             )
-            client.retrieve(
-                DATASET,
-                {
-                    "variable": "monthly_mean",
-                    "year": [str(year)],
-                    "month": [month],
-                    "version": "vdt2024",
-                },
-                target=str(cached_zip),
-            )
+            try:
+                client.retrieve(
+                    DATASET,
+                    {
+                        "variable": "monthly_mean",
+                        "year": [str(year)],
+                        "month": [month],
+                        "version": "vdt2024",
+                    },
+                    target=str(cached_zip),
+                )
+            except Exception as exc:
+                raise RuntimeError(f"CDS download failed for SLA {year}-{month}: {exc}") from exc
 
         with zipfile.ZipFile(cached_zip) as zf:
             zf.extractall(nc_dir)

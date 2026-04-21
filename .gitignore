@@ -16,8 +16,7 @@ CLAUDE.md
 data/
 .envrc
 
-# Bruin (contains credentials)
-.bruin.yml
+# Bruin (credentials / local state)
 .gcp-credentials.json
 bruin_history.db
 bruin-visualizer-history.html

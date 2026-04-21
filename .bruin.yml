@@ -1,0 +1,26 @@
+default_environment: dev
+
+environments:
+  dev:
+    connections:
+      duckdb:
+        - name: "warehouse"
+          path: "./data/sea-survey.duckdb"
+      generic:
+        - name: "CDS_API_KEY"
+          value: "${CDS_API_KEY}"
+
+  prod:
+    connections:
+      google_cloud_platform:
+        - name: "warehouse"
+          project_id: "${PROJECT_NAME}"
+          location: "${GCP_LOCATION}"
+          service_account_file: "${GOOGLE_CREDENTIALS}"
+      gcs:
+        - name: "gcs-data-lake"
+          service_account_file: "${GOOGLE_CREDENTIALS}"
+          bucket_name: "${GCP_BUCKET}"
+      generic:
+        - name: "CDS_API_KEY"
+          value: "${CDS_API_KEY}"

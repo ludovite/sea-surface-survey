@@ -82,19 +82,22 @@ def _fetch_month_cds(year: int, month: str) -> pd.DataFrame:
                 key=os.environ["CDS_API_KEY"],
                 url="https://cds.climate.copernicus.eu/api",
             )
-            client.retrieve(
-                DATASET,
-                {
-                    "variable": "all",
-                    "version": "3_0",
-                    "processinglevel": "level_4",
-                    "sensor_on_satellite": "combined_product",
-                    "temporal_resolution": "monthly",
-                    "year": [str(year)],
-                    "month": [month],
-                },
-                target=str(cached_zip),
-            )
+            try:
+                client.retrieve(
+                    DATASET,
+                    {
+                        "variable": "all",
+                        "version": "3_0",
+                        "processinglevel": "level_4",
+                        "sensor_on_satellite": "combined_product",
+                        "temporal_resolution": "monthly",
+                        "year": [str(year)],
+                        "month": [month],
+                    },
+                    target=str(cached_zip),
+                )
+            except Exception as exc:
+                raise RuntimeError(f"CDS download failed for SST {year}-{month}: {exc}") from exc
 
         with zipfile.ZipFile(cached_zip) as zf:
             zf.extractall(nc_dir)
