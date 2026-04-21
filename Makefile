@@ -1,7 +1,7 @@
 START  ?= 1993-01-01
 END    ?= 2023-12-31
 
-.PHONY: dev prod validate test infra-up infra-down infra-destroy dashboard help
+.PHONY: dev prod validate test infra-up infra-down infra-destroy cache-clean dashboard help
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -33,6 +33,9 @@ infra-down: ## Destroy BigQuery datasets only (GCS bucket is kept)
 
 infra-destroy: ## Destroy all GCP infrastructure (BigQuery + GCS bucket)
 	cd terraform && terraform destroy -auto-approve
+
+cache-clean: ## Remove raw files from hard disk
+	rm -rf data/cache
 
 dashboard: ## Run Streamlit dashboard locally
 	cd streamlit-app && uv run --with-requirements requirements.txt streamlit run app.py

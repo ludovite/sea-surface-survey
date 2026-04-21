@@ -14,7 +14,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap');
-html, body, [class*="css"], .stMarkdown, .stCaption { font-family: 'Inter', sans-serif; font-size: 17px; }
+html, body, [class*="css"], .stMarkdown, .stCaption { font-family: 'Inter', sans-serif; font-size: 18px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -41,7 +41,7 @@ if not os.environ.get("GCP_SA_JSON"):
 
 st.divider()
 
-st.subheader("Q1 — How fast are global ocean temperatures and sea levels rising?")
+st.subheader("How fast are global ocean temperatures and sea levels rising?")
 try:
     ctrl1, ctrl2 = st.columns([4, 1])
     with ctrl1:
@@ -60,7 +60,7 @@ except Exception as e:
 
 st.divider()
 
-st.subheader("Q2 — Is the rise accelerating?")
+st.subheader("Is the rise accelerating?")
 st.caption("Decadal averages — each bar represents the mean over a 10-year period.")
 try:
     fig_sla, fig_sst = chart_decades()
@@ -74,7 +74,7 @@ except Exception as e:
 
 st.divider()
 
-st.subheader("Q3 — Which latitude zones drive the signal?")
+st.subheader("Which latitude zones drive the signal?")
 st.caption("Click a zone in the legend to show/hide it.")
 try:
     streamlit_bokeh(chart_zones())
