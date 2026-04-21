@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 from streamlit_bokeh import streamlit_bokeh
 
@@ -21,6 +23,21 @@ st.caption(
     "30 years of ESA satellite observations (1993–2023) · "
     "Sea level anomaly & sea surface temperature · Global ocean"
 )
+
+if not os.environ.get("GCP_SA_JSON"):
+    st.info(
+        "**No BigQuery connection configured.** "
+        "Set the `GCP_SA_JSON` environment variable (service account JSON) "
+        "to connect to the production database. "
+        "See the README for setup instructions.",
+        icon="ℹ️",
+    )
+    charts = [f"./img/chart{i}.png" for i in range(1, 4)]
+    available = [p for p in charts if os.path.exists(p)]
+    if available:
+        for path in available:
+            st.image(path)
+    st.stop()
 
 st.divider()
 

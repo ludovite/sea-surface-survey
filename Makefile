@@ -34,4 +34,4 @@ infra-destroy: ## Destroy all GCP infrastructure (BigQuery + GCS bucket)
 	cd terraform && terraform destroy -auto-approve
 
 dashboard: ## Run Streamlit dashboard locally
-	cd streamlit-app && uv run streamlit run app.py
+	cd streamlit-app && uv run --with-requirements requirements.txt streamlit run app.py
