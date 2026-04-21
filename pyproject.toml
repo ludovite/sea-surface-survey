@@ -20,5 +20,6 @@ dev = [
     "marimo>=0.23.1",
     "matplotlib>=3.10.8",
     "pandas-stubs>=3.0.0.260204",
+    "pytest>=8.0.0",
     "scipy>=1.17.1",
 ]

@@ -1,7 +1,7 @@
 START  ?= 1993-01-01
 END    ?= 2023-12-31
 
-.PHONY: dev prod validate infra-up infra-down dashboard help
+.PHONY: dev prod validate test infra-up infra-down dashboard help
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -16,6 +16,9 @@ prod: ## Run pipeline on GCP (BigQuery + GCS). make prod START=... END=...
 
 validate: ## Validate pipeline assets
 	bruin validate
+
+test: ## Run unit tests
+	uv run pytest tests/ -v
 
 infra-up: ## Provision GCP infrastructure (Terraform)
 	cd terraform && terraform init && terraform validate && terraform apply -auto-approve
