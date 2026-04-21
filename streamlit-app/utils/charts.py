@@ -3,7 +3,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from bokeh.io import curdoc
-from bokeh.models import ColumnDataSource, FactorRange, HoverTool, Legend, LegendItem
+from bokeh.models import (
+    ColorBar,
+    ColumnDataSource,
+    FactorRange,
+    HoverTool,
+    Legend,
+    LegendItem,
+    LinearColorMapper,
+)
+from bokeh.palettes import Inferno256
 from bokeh.plotting import figure
 from bokeh.themes import Theme
 
@@ -150,4 +159,49 @@ def chart_zones() -> figure:
         tooltips=[("zone", "@zone"), ("date", "@x{%F}"), ("SST", "@y{0.00} °C")],
         formatters={"@x": "datetime"},
     ))
+    return p
+
+
+def chart_sst_map(year: int, month: int) -> figure:
+    """World map: SST heatmap on the 0.25° grid for a given year/month."""
+    df = query(f"""
+        SELECT latitude, longitude, sst_celsius
+        FROM `{project_id()}.staging.sea_surface_temperature`
+        WHERE year = {year} AND month = {month}
+    """)
+
+    # Build 2-D grid [lat × lon], NaN where no ocean data
+    n_lat, n_lon = 721, 1441
+    grid = np.full((n_lat, n_lon), np.nan)
+    lat_idx = np.round((df["latitude"].values + 90.0) / 0.25).astype(int).clip(0, n_lat - 1)
+    lon_idx = np.round((df["longitude"].values + 180.0) / 0.25).astype(int).clip(0, n_lon - 1)
+    grid[lat_idx, lon_idx] = df["sst_celsius"].values
+
+    mapper = LinearColorMapper(
+        palette=Inferno256,
+        low=-2.0,
+        high=35.0,
+        nan_color="#1e2030",
+    )
+
+    p = figure(
+        title=f"Sea Surface Temperature — {year}-{month:02d}",
+        x_axis_label="Longitude",
+        y_axis_label="Latitude",
+        x_range=(-180, 180),
+        y_range=(-90, 90),
+        height=380,
+        toolbar_location="above",
+        sizing_mode="stretch_width",
+    )
+    p.image(
+        image=[grid],
+        x=-180, y=-90,
+        dw=360, dh=180,
+        color_mapper=mapper,
+    )
+    p.add_layout(
+        ColorBar(color_mapper=mapper, label_standoff=12, title="SST (°C)"),
+        "right",
+    )
     return p
